@@ -21,9 +21,9 @@ from modules import (
 def run_pipeline():
     # 1. init LLM
     try:
-        local_llm = ChatOllama(model="gemma:2b", temperature=0.1, base_url="http://localhost:11434")
-        local_embedding = OllamaEmbeddings(model="nomic-embed-text:latest")
-        local_kw = KeyBERT(model="all-MiniLM-L6-v2")
+        local_llm = ChatOllama(model="SOME_MODEL_HERE", temperature=0.1, base_url="http://localhost:11434")
+        local_embedding = OllamaEmbeddings(model="SOME_MODEL_HERE")
+        local_kw = KeyBERT(model="SOME_MODEL_HERE")
         print(f"Loaded language model: {local_llm.model}\n")
         print(f"Loaded embedding model: {local_embedding.model}\n")
         print(f"Loaded KeyBERT model: {local_kw.model}\n")
