@@ -11,37 +11,46 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain_community.chat_models import ChatOllama
 from langchain_community.embeddings import OllamaEmbeddings
 
+from keybert import KeyBERT
+
 from modules import (
-    NeedsAnalysisAgent
+    NeedsAnalysisAgent,
+    CorpusAnalysisAgent
 )
 
 def run_pipeline():
-
-    # 4. init LLM
+    # 1. init LLM
     try:
         local_llm = ChatOllama(model="gemma:2b", temperature=0.1, base_url="http://localhost:11434")
         local_embedding = OllamaEmbeddings(model="nomic-embed-text:latest")
+        local_kw = KeyBERT(model="all-MiniLM-L6-v2")
         print(f"Loaded language model: {local_llm.model}\n")
         print(f"Loaded embedding model: {local_embedding.model}\n")
+        print(f"Loaded KeyBERT model: {local_kw.model}\n")
     except Exception as e:
         print(f"Failed to load language model. {e}\n")
         return
     
-    # 5. init agents
+    # 2. init agents
     try:
         need_analysis_agent = NeedsAnalysisAgent(llm=local_llm, embedding_model=local_embedding)
+        corpus_analysis_agent = CorpusAnalysisAgent(llm=local_llm, embedding_model=local_embedding, kw_model=local_kw)
         print("Loaded all agents.\n")
     except Exception as e:
         print(f"Failed to initialize agents. {e}\n")
         return
     
-    needs_dir = "/mnt/fa80f336-3342-4d78-8bfd-a43e434a2cda/proj/course-develop/data/jd"
-    needs = need_analysis_agent.run(directory_path=needs_dir)
+    # 3. init directory for processing
+    needs_dir = "some directory here"
+    corpus_dir = "some directory here"
+    needs_result = need_analysis_agent.run(directory_path=needs_dir)
+    corpus_result = corpus_analysis_agent.run(directory_path=corpus_dir)
 
-    # 4. Print the result from the dictionary
-    print(needs)
+    # 4. print result
+    print(needs_result)
+    for key, value in corpus_result.items():
+        print(f"{key}: {value} \t")
     
-
 
 def main():
     run_pipeline()
