@@ -9,7 +9,7 @@ from langchain_community.chat_models import ChatOllama
 from langchain_community.embeddings import OllamaEmbeddings
 
 # RAG components
-from langchain_community.document_loaders import DirectoryLoader, TextLoader, PyPDFLoader
+from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import create_retrieval_chain
@@ -45,7 +45,7 @@ class ModuleGeneratorAgent:
             docs = loader.load()
 
             if not docs:
-                raise FileNotFoundError(f"No PDF reference data found in '{data_sample_path}'.")
+                raise FileNotFoundError(f"ModuleGeneratorAgent: No PDF reference data found in '{data_sample_path}'.")
 
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
             split_docs = text_splitter.split_documents(docs)
