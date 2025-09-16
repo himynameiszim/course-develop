@@ -1,5 +1,4 @@
 # import warnings
-
 # warnings.filterwarnings("ignore")
 
 # LangChain components
@@ -14,7 +13,8 @@ from modules import (
     CorpusAnalysisAgent,
     LevelAnalysisAgent,
     SyllabusDesignerAgent,
-    ModuleGeneratorAgent
+    ModuleGeneratorAgent,
+    ContentPersonalizeAgent
 )
 
 def run_pipeline():
@@ -37,16 +37,18 @@ def run_pipeline():
         level_analysis_agent = LevelAnalysisAgent(llm=local_llm)
         syllabus_designer_agent = SyllabusDesignerAgent(llm=local_llm)
         module_generator_agent = ModuleGeneratorAgent(llm=local_llm, embedding_model=local_embedding)
+        content_personalize_agent = ContentPersonalizeAgent(llm=local_llm)
         print("Loaded all agents.\n")
     except Exception as e:
         print(f"Failed to initialize agents. {e}\n")
         return
     
     # 3. init directory for processing
-    needs_dir = "DIRECTORY_PATH"
-    corpus_dir = "DIRECTORY_PATH"
-    level_dir = "DIRECTORY_PATH"
-    data_bank = "DIRECTORY_PATH"
+    needs_dir = "/mnt/fa80f336-3342-4d78-8bfd-a43e434a2cda/"
+    corpus_dir = "/mnt/fa80f336-3342-4d78-8bfd-a43e434a2cda/"
+    level_dir = "/mnt/fa80f336-3342-4d78-8bfd-a43e434a2cda/"
+    data_bank = "/mnt/fa80f336-3342-4d78-8bfd-a43e434a2cda/"
+    personalized_dir = "/mnt/fa80f336-3342-4d78-8bfd-a43e434a2cda/"
 
     # 4. main pipeline
     try:
@@ -54,7 +56,7 @@ def run_pipeline():
         needs_result = need_analysis_agent.run(directory_path=needs_dir)
         print(needs_result + "\n")
     except Exception as e:
-        print("Error during Need Analysis Agent\n")
+        print(f"Error during Need Analysis Agent\n{str(e)}")
         return str(e)
 
     try:
@@ -63,7 +65,7 @@ def run_pipeline():
         for key, value in corpus_result.items():
             print(f"{key}: {value}\t\n")
     except Exception as e:
-        print("Error during Corpus Analysis Agent\n")
+        print(f"Error during Corpus Analysis Agent\n{str(e)}")
         return str(e)
 
     try:
@@ -71,7 +73,7 @@ def run_pipeline():
         level_result = level_analysis_agent.run(job_description=needs_result)
         print(level_result + "\n")
     except Exception as e:
-        print("Error during Level Analysis Agent\n")
+        print(f"Error during Level Analysis Agent\n{str(e)}")
         return str(e)
     
     try:
@@ -79,7 +81,7 @@ def run_pipeline():
         syllabus_result = syllabus_designer_agent.run(cefr_level=level_result, needs_analysis=needs_result, context=corpus_result)
         print(syllabus_result + "\n") 
     except Exception as e:
-        print("Error during Syllabus Designer Agent\n")
+        print(f"Error during Syllabus Designer Agent\n{str(e)}")
         return str(e)
     
     try:
@@ -87,7 +89,15 @@ def run_pipeline():
         module_result = module_generator_agent.run(cefr_level=level_result, syllabus_template=syllabus_result, data_sample_path=data_bank)
         print(module_result)
     except Exception as e:
-        print(f"Error during Module Generator Agent\n{e}")
+        print(f"Error during Module Generator Agent\n{str(e)}")
+        return str(e)
+    
+    try:
+        print("-----Running Content Personalization Agent-----\n")
+        personalized_module_result = content_personalize_agent.run(module_template=module_result, personalized_details_path=personalized_dir)
+        print(personalized_module_result)
+    except Exception as e:
+        print(f"Error during Content Personalization Agent\n{str(e)}")
         return str(e)
 
     
